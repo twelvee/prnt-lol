@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}">
+<head data-current-lang="{{ current_lang }}">
+    <meta charset="utf-8" />
+    <title>{{ site_title }}</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: radial-gradient(circle at top, #020617, #020617 40%, #020617 100%);
+            color: #e5e7eb;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .top-bar {
+            padding: 10px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            background: rgba(15,23,42,0.85);
+            border-bottom: 1px solid #111827;
+        }
+        .top-title {
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            position: relative;
+            cursor: default;
+        }
+        .top-title::after {
+            content: attr(data-hint);
+            position: absolute;
+            left: 0;
+            top: 100%;
+            transform: translateY(12px);
+            background: rgba(2,6,23,0.95);
+            color: #cbd5f5;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.4;
+            width: 240px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            white-space: normal;
+            z-index: 5;
+        }
+        .top-title:hover::after {
+            opacity: 1;
+            transform: translateY(6px);
+        }
+        .top-hint {
+            color: rgba(156,163,175,0.8);
+            font-size: 12px;
+        }
+        .main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+        .image-frame {
+            max-width: 90vw;
+            max-height: 80vh;
+            border-radius: 18px;
+            background: #020617;
+            border: 1px solid #1f2937;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+        }
+        .bottom-bar {
+            padding: 10px 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(15,23,42,0.95);
+            border-top: 1px solid #111827;
+            font-size: 13px;
+        }
+        .bottom-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .bottom-left a {
+            color: #93c5fd;
+            text-decoration: none;
+        }
+        .bottom-left a:hover {
+            text-decoration: underline;
+        }
+        .bottom-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 10px 25px rgba(59,130,246,0.45);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s ease;
+        }
+        .btn:hover { background: #2563eb; }
+        .btn-emoji {
+            font-size: 18px;
+            line-height: 1;
+            transition: transform 0.2s ease;
+        }
+        .btn:hover .btn-emoji {
+            transform: rotate(-6deg) scale(1.1);
+        }
+        .hint { color: #6b7280; }
+        @media (max-width: 640px) {
+            .top-bar { font-size: 13px; flex-direction: column; align-items: flex-start; }
+            .bottom-bar { flex-direction: column; align-items: flex-start; }
+            .language-switcher { flex-wrap: wrap; }
+        }
+        .language-switcher {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            font-size: 12px;
+            flex-wrap: wrap;
+        }
+        .lang-link {
+            color: #9ca3af;
+            text-decoration: none;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+        }
+        .lang-link:hover { color: #f3f4f6; }
+        .lang-link.active {
+            border-color: #3b82f6;
+            color: #f3f4f6;
+        }
+    </style>
+</head>
+<body>
+        <div class="top-bar">
+            <div class="top-title" data-hint="{{ texts.title_popover }}">{{ texts.viewer_title }}</div>
+        <div class="top-hint">{{ texts.loading_hint }}</div>
+        <div class="language-switcher">
+                {% for language in languages %}
+                    <a class="lang-link{% if language.code == current_lang %} active{% endif %}"
+                       href="/" data-lang="{{ language.code }}" title="{{ language.label }}">
+                        {{ language.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    <div class="main">
+        <div class="image-frame">
+            <img src="{{ data.image_url }}" alt="{{ data.id }}">
+        </div>
+    </div>
+        <div class="bottom-bar">
+            <div class="bottom-left">
+                <div>
+                    {{ texts.original_label }}
+                    <a href="{{ data.page_url }}" target="_blank" rel="noopener">
+                        {{ data.page_url }}
+                    </a>
+                </div>
+                <div class="hint">{{ texts.hint }}</div>
+            </div>
+            <div class="bottom-right">
+                <a href="/" class="btn" id="next-btn" data-lang="{{ current_lang }}">
+                    <span class="btn-emoji">✨</span>
+                    <span class="btn-label">{{ texts.button }}</span>
+                </a>
+            </div>
+        </div>
+    <script>
+        (function() {
+            const emojis = {{ emoji_list | tojson }};
+            const btn = document.getElementById("next-btn");
+            if (btn) {
+                const emojiSpan = btn.querySelector(".btn-emoji");
+                const pickEmoji = () => {
+                    const idx = Math.floor(Math.random() * emojis.length);
+                    if (emojiSpan) emojiSpan.textContent = emojis[idx];
+                };
+                btn.addEventListener("mouseenter", pickEmoji);
+                btn.addEventListener("focus", pickEmoji);
+                pickEmoji();
+            }
+
+            const CURRENT_LANG = document.head.dataset.currentLang || "{{ DEFAULT_LANG }}";
+            const STORAGE_KEY = "prnt_random_lang";
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (!saved || saved !== CURRENT_LANG) {
+                    localStorage.setItem(STORAGE_KEY, CURRENT_LANG);
+                }
+            } catch (err) {
+                console.warn("localStorage unavailable", err);
+            }
+
+            const applyLang = (lang) => {
+                try {
+                    localStorage.setItem(STORAGE_KEY, lang);
+                } catch (err) {}
+                fetch("/?lang=" + lang)
+                    .then(() => window.location.href = "/")
+                    .catch(() => window.location.href = "/");
+            };
+
+            document.querySelectorAll("[data-lang]").forEach((el) => {
+                el.addEventListener("click", (evt) => {
+                    evt.preventDefault();
+                    const lang = el.getAttribute("data-lang");
+                    if (!lang) return;
+                    applyLang(lang);
+                });
+            });
+
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved && saved !== CURRENT_LANG) {
+                    fetch("/?lang=" + saved)
+                        .then(() => window.location.href = "/")
+                        .catch(() => window.location.href = "/");
+                }
+            } catch (err) {}
+        })();
+    </script>
+</body>
+</html>
