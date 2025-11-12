@@ -2,7 +2,7 @@
 <html lang="{{ current_lang }}">
 <head data-current-lang="{{ current_lang }}">
     <meta charset="utf-8" />
-    <title>{{ site_title }}</title>
+    <title>{{ site.title }}</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -211,24 +211,44 @@
                 pickEmoji();
             }
 
-            const CURRENT_LANG = document.head.dataset.currentLang || "{{ DEFAULT_LANG }}";
+            const CURRENT_LANG = document.head.dataset.currentLang || "{{ default_lang }}";
             const STORAGE_KEY = "prnt_random_lang";
+            let storageAvailable = true;
+            let storedLang = null;
             try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                if (!saved || saved !== CURRENT_LANG) {
-                    localStorage.setItem(STORAGE_KEY, CURRENT_LANG);
-                }
+                storedLang = localStorage.getItem(STORAGE_KEY);
             } catch (err) {
-                console.warn("localStorage unavailable", err);
+                storageAvailable = false;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlLang = urlParams.get("lang");
+            if (urlLang) {
+                if (storageAvailable) {
+                    try {
+                        localStorage.setItem(STORAGE_KEY, urlLang);
+                    } catch (err) {}
+                }
+                urlParams.delete("lang");
+                const cleanQuery = urlParams.toString();
+                const newUrl = window.location.pathname + (cleanQuery ? `?${cleanQuery}` : "") + window.location.hash;
+                window.history.replaceState({}, "", newUrl || "/");
+            } else if (storageAvailable && storedLang && storedLang !== CURRENT_LANG) {
+                window.location.href = "/?lang=" + storedLang;
+                return;
+            } else if (storageAvailable && (!storedLang || storedLang !== CURRENT_LANG)) {
+                try {
+                    localStorage.setItem(STORAGE_KEY, CURRENT_LANG);
+                } catch (err) {}
             }
 
             const applyLang = (lang) => {
-                try {
-                    localStorage.setItem(STORAGE_KEY, lang);
-                } catch (err) {}
-                fetch("/?lang=" + lang)
-                    .then(() => window.location.href = "/")
-                    .catch(() => window.location.href = "/");
+                if (storageAvailable) {
+                    try {
+                        localStorage.setItem(STORAGE_KEY, lang);
+                    } catch (err) {}
+                }
+                window.location.href = "/?lang=" + lang;
             };
 
             document.querySelectorAll("[data-lang]").forEach((el) => {
@@ -240,14 +260,6 @@
                 });
             });
 
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                if (saved && saved !== CURRENT_LANG) {
-                    fetch("/?lang=" + saved)
-                        .then(() => window.location.href = "/")
-                        .catch(() => window.location.href = "/");
-                }
-            } catch (err) {}
         })();
     </script>
 </body>

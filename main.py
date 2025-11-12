@@ -374,6 +374,7 @@ def show_random_html(request: Request, lang: Optional[str] = Query(None, descrip
         "languages": languages,
         "current_lang": lang,
         "site_title": SITE_TITLE,
+        "default_lang": DEFAULT_LANG,
         "emoji_list": ["✨", "⚡️", "🌠", "🎲", "🎯", "🚀", "🌈", "🌀", "💫"],
     }
     return templates.TemplateResponse("show_random.html", context)
